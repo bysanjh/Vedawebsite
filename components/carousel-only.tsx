@@ -7,7 +7,7 @@ const CARD_W = 260;
 const CARD_H = 380;
 const GAP = 80;
 const STEP = CARD_W + GAP;
-const ACTIVE_SCALE = 1.1;
+const ACTIVE_SCALE = 1.2;
 const SCALE_DROP_PER_STEP = 0.07;
 const OPACITY_DROP_PER_STEP = 0.18;
 const TILT_VELOCITY_MULTIPLIER = 0.35;
@@ -258,6 +258,35 @@ export function CarouselOnly({ cards, initialIndex }: CarouselOnlyProps) {
             />
           </div>
         ))}
+      </div>
+
+      {/* Start chat CTA — below active card */}
+      <div
+        style={{
+          position: "absolute",
+          top: `calc(50% + ${CARD_H * ACTIVE_SCALE / 2 + 28}px)`,
+          left: "50%",
+          transform: "translateX(-50%)",
+          zIndex: 20,
+        }}
+      >
+        <button
+          style={{
+            backgroundColor: "#47429c",
+            color: "#ffffff",
+            padding: "12px 64px",
+            borderRadius: "10px",
+            fontSize: "20px",
+            fontFamily: "var(--font-roboto), sans-serif",
+            letterSpacing: "-0.8px",
+            fontWeight: 400,
+            border: "none",
+            cursor: "pointer",
+            whiteSpace: "nowrap",
+          }}
+        >
+          Start chat
+        </button>
       </div>
 
       {/* Dot indicators */}
