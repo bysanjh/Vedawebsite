@@ -153,18 +153,23 @@ export function CarouselOnly({ cards, initialIndex }: CarouselOnlyProps) {
     const el = containerRef.current;
     if (!el) return;
     // Start hidden — slides down into place on scroll
-    gsap.set(el, { y: -80, opacity: 0 });
+    gsap.set(el, { y: -160, opacity: 0, scale: 0.92 });
 
     let hasAnimated = false;
 
     const onScroll = () => {
       if (hasAnimated) return;
       const rect = el.getBoundingClientRect();
-      // Trigger when the top of the section crosses 60% down the viewport
-      if (rect.top < window.innerHeight * 0.6) {
+      if (rect.top < window.innerHeight * 0.75) {
         hasAnimated = true;
         snapToIndex(startIndex);
-        gsap.to(el, { y: 0, opacity: 1, duration: 1, ease: "power3.out" });
+        gsap.to(el, {
+          y: 0,
+          opacity: 1,
+          scale: 1,
+          duration: 1.2,
+          ease: "power4.out",
+        });
         window.removeEventListener("scroll", onScroll);
       }
     };
