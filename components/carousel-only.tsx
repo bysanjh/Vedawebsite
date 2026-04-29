@@ -249,24 +249,6 @@ export function CarouselOnly({ cards, initialIndex }: CarouselOnlyProps) {
               visibility: visible ? "visible" : "hidden",
               willChange: "transform, opacity",
             }}
-            onPointerEnter={() => {
-              if (hoverTimeoutRef.current) {
-                clearTimeout(hoverTimeoutRef.current);
-              }
-              if (!isDragging.current && i !== currentIndex.current) {
-                hoverTimeoutRef.current = setTimeout(() => {
-                  if (!isDragging.current && i !== currentIndex.current) {
-                    snapToIndex(i);
-                  }
-                }, 200);
-              }
-            }}
-            onPointerLeave={() => {
-              if (hoverTimeoutRef.current) {
-                clearTimeout(hoverTimeoutRef.current);
-                hoverTimeoutRef.current = null;
-              }
-            }}
           >
             <img
               src={card.image}
