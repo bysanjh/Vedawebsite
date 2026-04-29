@@ -9,7 +9,7 @@ const GAP = 80;
 const STEP = CARD_W + GAP;
 const ACTIVE_SCALE = 1.1;
 const SCALE_DROP_PER_STEP = 0.07;
-const OPACITY_DROP_PER_STEP = 0.28;
+const OPACITY_DROP_PER_STEP = 0.18;
 const TILT_VELOCITY_MULTIPLIER = 0.35;
 const TILT_LERP = 0.25;
 const TILT_DECAY = 0.88;
@@ -52,6 +52,7 @@ export function CarouselOnly({ cards, initialIndex }: CarouselOnlyProps) {
   const [visible, setVisible] = useState(false);
   const [activeIndex, setActiveIndex] = useState(startIndex);
   const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
 
   useEffect(() => {
     const updateCards = () => {
@@ -145,6 +146,20 @@ export function CarouselOnly({ cards, initialIndex }: CarouselOnlyProps) {
       },
     });
   };
+
+  // Reset to middle card whenever section scrolls into view
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) snapToIndex(startIndex);
+      },
+      { threshold: 0.3 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   const handlePointerDown = (e: React.PointerEvent) => {
     isDragging.current = true;
