@@ -152,19 +152,19 @@ export function CarouselOnly({ cards, initialIndex }: CarouselOnlyProps) {
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
+    // Set initial hidden state
+    gsap.set(el, { y: -60, opacity: 0 });
+
+    let hasAnimated = false;
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) {
+        if (entry.isIntersecting && !hasAnimated) {
+          hasAnimated = true;
           snapToIndex(startIndex);
-          // Slide-up entrance animation
-          gsap.fromTo(
-            el,
-            { y: 80, opacity: 0 },
-            { y: 0, opacity: 1, duration: 0.9, ease: "power3.out" }
-          );
+          gsap.to(el, { y: 0, opacity: 1, duration: 0.9, ease: "power3.out" });
         }
       },
-      { threshold: 0.2 }
+      { threshold: 0.15 }
     );
     observer.observe(el);
     return () => observer.disconnect();
