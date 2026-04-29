@@ -241,6 +241,7 @@ export function CarouselOnly({ cards, initialIndex }: CarouselOnlyProps) {
             ref={(el) => {
               cardRefs.current[i] = el;
             }}
+            onClick={() => { if (!isDragging.current) snapToIndex(i); }}
             className="absolute top-0 left-0 rounded-[20px] overflow-hidden cursor-pointer"
             style={{
               width: CARD_W,
