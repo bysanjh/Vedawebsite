@@ -56,18 +56,41 @@ export function CarouselOnly({ cards, initialIndex }: CarouselOnlyProps) {
 
 
   useEffect(() => {
+    const EDGE_GAP = 55; // equal visual gap between card edges
+
+    const getScale = (offsetSteps: number) => {
+      const abs = Math.abs(offsetSteps);
+      const s = abs < 0.5
+        ? ACTIVE_SCALE - abs * (ACTIVE_SCALE - 1) * 2
+        : 1.0 - (abs - 0.5) * SCALE_DROP_PER_STEP * 2;
+      return Math.max(0.5, s);
+    };
+
     const updateCards = () => {
+      const activeFloat = scrollX.current / STEP;
+      const n = cards.length;
+
+      // Build cumulative positions with equal edge gaps
+      const pos: number[] = new Array(n).fill(0);
+      for (let i = 1; i < n; i++) {
+        const s0 = getScale(i - 1 - activeFloat);
+        const s1 = getScale(i - activeFloat);
+        pos[i] = pos[i - 1] + (s0 + s1) * CARD_W / 2 + EDGE_GAP;
+      }
+
+      // Interpolate the "center" position in pos-space
+      const f = Math.floor(activeFloat);
+      const c = Math.min(Math.ceil(activeFloat), n - 1);
+      const t = activeFloat - f;
+      const centerPos = f === c ? pos[f] : pos[f] * (1 - t) + pos[c] * t;
+
       cardRefs.current.forEach((el, i) => {
         if (!el) return;
 
-        const offsetPx = i * STEP - scrollX.current;
-        const offsetSteps = offsetPx / STEP;
+        const offsetPx = pos[i] - centerPos;
+        const offsetSteps = i - activeFloat;
         const absOffset = Math.abs(offsetSteps);
-
-        const baseScale =
-          absOffset < 0.5
-            ? ACTIVE_SCALE - absOffset * (ACTIVE_SCALE - 1) * 2
-            : 1.0 - (absOffset - 0.5) * SCALE_DROP_PER_STEP * 2;
+        const scale = getScale(offsetSteps);
 
         const tiltDirection = groupTilt.current > 0 ? 1 : -1;
         const cardSide = offsetSteps > 0 ? 1 : -1;
@@ -83,7 +106,7 @@ export function CarouselOnly({ cards, initialIndex }: CarouselOnlyProps) {
         gsap.set(el, {
           x: offsetPx,
           y: liftAmount,
-          scale: Math.max(0.5, baseScale),
+          scale,
           opacity: Math.max(0, 1.0 - absOffset * OPACITY_DROP_PER_STEP),
           rotateZ: groupTilt.current,
           rotateX: perspectiveRotateX,
