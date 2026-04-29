@@ -152,22 +152,25 @@ export function CarouselOnly({ cards, initialIndex }: CarouselOnlyProps) {
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
-    // Set initial hidden state
-    gsap.set(el, { y: -60, opacity: 0 });
+    // Start hidden — slides down into place on scroll
+    gsap.set(el, { y: -80, opacity: 0 });
 
     let hasAnimated = false;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting && !hasAnimated) {
-          hasAnimated = true;
-          snapToIndex(startIndex);
-          gsap.to(el, { y: 0, opacity: 1, duration: 0.9, ease: "power3.out" });
-        }
-      },
-      { threshold: 0.15 }
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
+
+    const onScroll = () => {
+      if (hasAnimated) return;
+      const rect = el.getBoundingClientRect();
+      // Trigger when the top of the section crosses 60% down the viewport
+      if (rect.top < window.innerHeight * 0.6) {
+        hasAnimated = true;
+        snapToIndex(startIndex);
+        gsap.to(el, { y: 0, opacity: 1, duration: 1, ease: "power3.out" });
+        window.removeEventListener("scroll", onScroll);
+      }
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   const handlePointerDown = (e: React.PointerEvent) => {
