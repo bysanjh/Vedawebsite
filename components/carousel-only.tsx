@@ -201,12 +201,6 @@ export function CarouselOnly({ cards, initialIndex }: CarouselOnlyProps) {
     snapToIndex(nearestIndex);
   };
 
-  const handleWheel = (e: React.WheelEvent) => {
-    e.preventDefault();
-    const direction = e.deltaY > 0 ? 1 : -1;
-    const newIndex = Math.round(scrollX.current / STEP) + direction;
-    snapToIndex(newIndex);
-  };
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -229,7 +223,6 @@ export function CarouselOnly({ cards, initialIndex }: CarouselOnlyProps) {
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
       onPointerLeave={handlePointerUp}
-      onWheel={handleWheel}
     >
       {/* Cards container */}
       <div
