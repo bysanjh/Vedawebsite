@@ -52,6 +52,7 @@ export function CarouselOnly({ cards, initialIndex }: CarouselOnlyProps) {
   const [visible, setVisible] = useState(false);
   const [activeIndex, setActiveIndex] = useState(startIndex);
   const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const dragDistanceRef = useRef(0);
 
 
   useEffect(() => {
@@ -153,9 +154,17 @@ export function CarouselOnly({ cards, initialIndex }: CarouselOnlyProps) {
     if (!el) return;
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) snapToIndex(startIndex);
+        if (entry.isIntersecting) {
+          snapToIndex(startIndex);
+          // Slide-up entrance animation
+          gsap.fromTo(
+            el,
+            { y: 80, opacity: 0 },
+            { y: 0, opacity: 1, duration: 0.9, ease: "power3.out" }
+          );
+        }
       },
-      { threshold: 0.3 }
+      { threshold: 0.2 }
     );
     observer.observe(el);
     return () => observer.disconnect();
@@ -167,6 +176,7 @@ export function CarouselOnly({ cards, initialIndex }: CarouselOnlyProps) {
     dragStartScrollX.current = scrollX.current;
     lastX.current = e.clientX;
     velX.current = 0;
+    dragDistanceRef.current = 0;
 
     gsap.killTweensOf(scrollX);
     isAnimating.current = false;
@@ -179,6 +189,7 @@ export function CarouselOnly({ cards, initialIndex }: CarouselOnlyProps) {
 
     const currentX = e.clientX;
     velX.current = currentX - lastX.current;
+    dragDistanceRef.current += Math.abs(velX.current);
     lastX.current = currentX;
 
     const dragDelta = (currentX - dragStartX.current) * DRAG_MULTIPLIER;
@@ -241,7 +252,7 @@ export function CarouselOnly({ cards, initialIndex }: CarouselOnlyProps) {
             ref={(el) => {
               cardRefs.current[i] = el;
             }}
-            onClick={() => { if (!isDragging.current) snapToIndex(i); }}
+            onClick={() => { if (dragDistanceRef.current < 8) snapToIndex(i); }}
             className="absolute top-0 left-0 rounded-[20px] overflow-hidden cursor-pointer"
             style={{
               width: CARD_W,
